@@ -1,60 +1,65 @@
-import './style.css'
-import typescriptLogo from './assets/typescript.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import { setupCounter } from './counter.ts'
+import './style.css';
+import { Calculator } from './calculator';
 
-document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
-<section id="center">
-  <div class="hero">
-    <img src="${heroImg}" class="base" width="170" height="179">
-    <img src="${typescriptLogo}" class="framework" alt="TypeScript logo"/>
-    <img src=${viteLogo} class="vite" alt="Vite logo" />
-  </div>
-  <div>
-    <h1>Get started</h1>
-    <p>Edit <code>src/main.ts</code> and save to test <code>HMR</code></p>
-  </div>
-  <button id="counter" type="button" class="counter"></button>
-</section>
+const numberButtons = document.querySelectorAll('[data-number]');
+const operationButtons = document.querySelectorAll('[data-operation]');
+const equalsButton = document.querySelector('[data-equals]');
+const deleteButton = document.querySelector('[data-delete]');
+const allClearButton = document.querySelector('[data-all-clear]');
+const previousOperandElement = document.getElementById('previous-operand')!;
+const currentOperandElement = document.getElementById('current-operand')!;
 
-<div class="ticks"></div>
+const calculator = new Calculator(previousOperandElement, currentOperandElement);
 
-<section id="next-steps">
-  <div id="docs">
-    <svg class="icon" role="presentation" aria-hidden="true"><use href="/icons.svg#documentation-icon"></use></svg>
-    <h2>Documentation</h2>
-    <p>Your questions, answered</p>
-    <ul>
-      <li>
-        <a href="https://vite.dev/" target="_blank">
-          <img class="logo" src=${viteLogo} alt="" />
-          Explore Vite
-        </a>
-      </li>
-      <li>
-        <a href="https://www.typescriptlang.org" target="_blank">
-          <img class="button-icon" src="${typescriptLogo}" alt="">
-          Learn more
-        </a>
-      </li>
-    </ul>
-  </div>
-  <div id="social">
-    <svg class="icon" role="presentation" aria-hidden="true"><use href="/icons.svg#social-icon"></use></svg>
-    <h2>Connect with us</h2>
-    <p>Join the Vite community</p>
-    <ul>
-      <li><a href="https://github.com/vitejs/vite" target="_blank"><svg class="button-icon" role="presentation" aria-hidden="true"><use href="/icons.svg#github-icon"></use></svg>GitHub</a></li>
-      <li><a href="https://chat.vite.dev/" target="_blank"><svg class="button-icon" role="presentation" aria-hidden="true"><use href="/icons.svg#discord-icon"></use></svg>Discord</a></li>
-      <li><a href="https://x.com/vite_js" target="_blank"><svg class="button-icon" role="presentation" aria-hidden="true"><use href="/icons.svg#x-icon"></use></svg>X.com</a></li>
-      <li><a href="https://bsky.app/profile/vite.dev" target="_blank"><svg class="button-icon" role="presentation" aria-hidden="true"><use href="/icons.svg#bluesky-icon"></use></svg>Bluesky</a></li>
-    </ul>
-  </div>
-</section>
+numberButtons.forEach((button) => {
+  button.addEventListener('click', () => {
+    calculator.appendNumber(button.innerHTML);
+    calculator.updateDisplay();
+  });
+});
 
-<div class="ticks"></div>
-<section id="spacer"></section>
-`
+operationButtons.forEach((button) => {
+  button.addEventListener('click', () => {
+    calculator.chooseOperation(button.innerHTML);
+    calculator.updateDisplay();
+  });
+});
 
-setupCounter(document.querySelector<HTMLButtonElement>('#counter')!)
+equalsButton?.addEventListener('click', () => {
+  calculator.compute();
+  calculator.updateDisplay();
+});
+
+allClearButton?.addEventListener('click', () => {
+  calculator.clear();
+  calculator.updateDisplay();
+});
+
+deleteButton?.addEventListener('click', () => {
+  calculator.delete();
+  calculator.updateDisplay();
+});
+
+// Keyboard Support
+window.addEventListener('keydown', (e) => {
+  if (e.key >= '0' && e.key <= '9') {
+    calculator.appendNumber(e.key);
+  } else if (e.key === '.') {
+    calculator.appendNumber('.');
+  } else if (e.key === '=' || e.key === 'Enter') {
+    calculator.compute();
+  } else if (e.key === 'Backspace') {
+    calculator.delete();
+  } else if (e.key === 'Escape') {
+    calculator.clear();
+  } else if (e.key === '+') {
+    calculator.chooseOperation('+');
+  } else if (e.key === '-') {
+    calculator.chooseOperation('-');
+  } else if (e.key === '*' || e.key === 'x') {
+    calculator.chooseOperation('×');
+  } else if (e.key === '/') {
+    calculator.chooseOperation('÷');
+  }
+  calculator.updateDisplay();
+});
